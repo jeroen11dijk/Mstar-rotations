@@ -77,7 +77,7 @@ class Mstar:
 
     def backprop(self, current: MstarNode, collisions):
         if not collisions.issubset(current.collision_set):
-            current.collision_set.add(collisions)
+            current.collision_set.update(collisions)
             heapq.heappush(self.open, current)
             for next in current.backset:
                 self.backprop(next, current.collision_set)
@@ -86,11 +86,11 @@ class Mstar:
         seen = set()
         double = set()
         for node in nodes:
-            if node in seen:
-                double.add(node)
+            if node.position in seen:
+                double.add(node.position)
             else:
-                seen.add(node)
-        return set([i for i, node in enumerate(nodes) if node in double])
+                seen.add(node.position)
+        return set([i for i, node in enumerate(nodes) if node.position in double])
 
     def getNeighbors(self, current: MstarNode):
         neighbors = []
