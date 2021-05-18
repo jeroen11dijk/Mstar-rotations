@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="81fcc743-33cf-4c72-88d4-ddd70557d8f9" name="Default Changelist" comment="">
+    <list default="true" id="81fcc743-33cf-4c72-88d4-ddd70557d8f9" name="Default Changelist" comment="We have to check that i is in the collision set since it contains indices">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -83,7 +83,8 @@
       <updated>1621327937196</updated>
       <workItem from="1621327940693" duration="484000" />
       <workItem from="1621328442835" duration="6430000" />
-      <workItem from="1621343474178" duration="6921000" />
+      <workItem from="1621343474178" duration="7203000" />
+      <workItem from="1621350751990" duration="457000" />
     </task>
     <task id="LOCAL-00001" summary="Made it so collisions only check for location">
       <created>1621350045095</created>
@@ -99,7 +100,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621350345646</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="We have to check that i is in the collision set since it contains indices">
+      <created>1621350484655</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1621350484655</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -108,57 +116,58 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Made it so collisions only check for location" />
     <MESSAGE value="Removed the assumption that waiting on the target has no cost which should simplify things" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed the assumption that waiting on the target has no cost which should simplify things" />
+    <MESSAGE value="We have to check that i is in the collision set since it contains indices" />
+    <option name="LAST_COMMIT_MESSAGE" value="We have to check that i is in the collision set since it contains indices" />
   </component>
   <component name="WindowStateProjectService">
     <state x="763" y="448" key="#xdebugger.evaluate" timestamp="1621348597872">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="763" y="448" key="#xdebugger.evaluate/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621348597872" />
-    <state x="585" y="111" key="CommitChangelistDialog2" timestamp="1621350345390">
+    <state x="585" y="111" key="CommitChangelistDialog2" timestamp="1621350595116">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="111" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350345390" />
-    <state width="1877" height="287" key="GridCell.Tab.0.bottom" timestamp="1621350459638">
+    <state x="585" y="111" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350595116" />
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="287" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350459638" />
-    <state width="1877" height="287" key="GridCell.Tab.0.center" timestamp="1621350459638">
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.0.center" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="287" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350459638" />
-    <state width="1877" height="287" key="GridCell.Tab.0.left" timestamp="1621350459638">
+    <state width="1877" height="348" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.0.left" timestamp="1621351212549">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="287" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350459638" />
-    <state width="1877" height="287" key="GridCell.Tab.0.right" timestamp="1621350459638">
+    <state width="1877" height="348" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212549" />
+    <state width="1877" height="348" key="GridCell.Tab.0.right" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="287" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350459638" />
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1621350426104">
+    <state width="1877" height="348" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350426104" />
-    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1621350426103">
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350426103" />
-    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1621350426103">
+    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350426103" />
-    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1621350426103">
+    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1621351212550">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350426103" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621351212550" />
     <state x="461" y="162" key="SettingsEditor" timestamp="1621327979199">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="162" key="SettingsEditor/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621327979199" />
-    <state x="552" y="241" key="Vcs.Push.Dialog.v2" timestamp="1621350346504">
+    <state x="552" y="241" key="Vcs.Push.Dialog.v2" timestamp="1621350485592">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="241" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350346504" />
+    <state x="552" y="241" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1621350485592" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -168,6 +177,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/MstarRotations$main.coverage" NAME="main Coverage Results" MODIFIED="1621350459633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MstarRotations$main.coverage" NAME="main Coverage Results" MODIFIED="1621351212540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

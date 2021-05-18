@@ -52,7 +52,7 @@ class Mstar:
                 print(nbr)
                 neighbor = MstarNode(nbr)
                 neighbor.backset.add(current)
-                newCollisions = self.phi(neighbor.nodes)
+                newCollisions = self.phi(current.nodes, neighbor.nodes)
                 neighbor.collision_set.update(newCollisions)
                 self.backprop(current, neighbor.collision_set)
                 if len(newCollisions) == 0 and current.cost + self.getMoveCost(current, neighbor) < neighbor.cost:
@@ -74,15 +74,18 @@ class Mstar:
             for next in current.backset:
                 self.backprop(next, current.collision_set)
 
-    def phi(self, nodes):
+    def phi(self, current, next):
+        current = [temp.position for temp in current]
+        next = [temp.position for temp in next]
         seen = set()
         double = set()
-        for node in nodes:
-            if node.position in seen:
-                double.add(node.position)
+        edges = {k: l for k, l in zip(current, next)}
+        for i, val in enumerate(next):
+            if val in seen or val != current[i] and val in edges and edges[val] == current[i]:
+                double.add(val)
             else:
-                seen.add(node.position)
-        return set([i for i, node in enumerate(nodes) if node.position in double])
+                seen.add(val)
+        return set([i for i, node in enumerate(next) if node in double])
 
     def getNeighbors(self, current: MstarNode):
         neighbors = []
