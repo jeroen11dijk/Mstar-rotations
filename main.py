@@ -90,7 +90,7 @@ class Mstar:
         for i in range(self.n_agents):
             node: Node = current.nodes[i]
             options_i = []
-            if node in current.collision_set:
+            if i in current.collision_set:
                 options_i.append(node)
                 (x, y) = node.position
                 moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
