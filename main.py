@@ -11,7 +11,6 @@ class MstarNode:
         self.backset = set()
         self.backptr = None
         self.collision_set = set()
-        self.waiting = len(nodes) * [0]
 
     def __eq__(self, other):
         return self.nodes == other.nodes
@@ -57,11 +56,6 @@ class Mstar:
                 neighbor.collision_set.update(newCollisions)
                 self.backprop(current, neighbor.collision_set)
                 if len(newCollisions) == 0 and current.cost + self.getMoveCost(current, neighbor) < neighbor.cost:
-                    for i in range(self.n_agents):
-                        if neighbor.nodes[i] == current.nodes[i]:
-                            neighbor.waiting[i] = current.waiting[i] + 1
-                        else:
-                            neighbor.waiting[i] = 0
                     neighbor.cost = current.cost + self.getMoveCost(current, neighbor)
                     neighbor.backptr = current
                     heapq.heappush(self.open, neighbor)
@@ -69,9 +63,7 @@ class Mstar:
     def getMoveCost(self, current, next):
         cost = 0
         for i in range(self.n_agents):
-            if current.nodes[i] == self.goal.nodes[i] and next.nodes[i] != self.goal.nodes[i]:
-                cost += 1 + current.waiting[i]
-            elif not (current.nodes[i] == self.goal.nodes[i] == next.nodes[i]):
+            if current.nodes[i] != next.nodes[i]:
                 cost += 1
         return cost
 
@@ -128,6 +120,6 @@ if __name__ == "__main__":
                      [0, 1, 0, 1, 0, 1, 0],
                      [0, 1, 0, 1, 0, 1, 0],
                      [0, 0, 0, 0, 0, 0, 0]]
-    start = ((0, 0, 0), (0, 3, 0))
-    end = ((0, 5, 90), (0, 3, 270))
+    start = ((0, 0, 0), (0, 4, 0))
+    end = ((0, 5, 90), (0, 0, 270))
     print(Mstar(problem_graph, start, end).solve())
