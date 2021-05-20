@@ -6,6 +6,14 @@ from Astar import Astar, Node
 
 class MstarNode:
     def __init__(self, nodes, cost=float('inf')):
+        """
+        Used as the main datastructure
+        nodes: is a list of nodes to store the Astar node per agent
+        cost: is the cost to reach this node
+        backset: is the set of MstarNodes that have been explored to get to this MstarNode
+        backptr: the parent of the node
+        collision_set: The agents that are/will be in a collision if they follow their optimal path
+        """
         self.nodes = nodes
         self.cost = cost
         self.backset = set()
@@ -16,6 +24,7 @@ class MstarNode:
         return self.nodes == other.nodes
 
     def __lt__(self, other):
+        """ Used to do the sorting of the heap, by comparing the sum of the heuristics per node. """
         return sum([node.h for node in self.nodes]) < sum([node.h for node in other.nodes])
 
     def __repr__(self):
@@ -29,6 +38,7 @@ class Mstar:
     def __init__(self, grid, start, end):
         self.grid = grid
         self.n_agents = len(start)
+        # Convert the start and end to a MstarNode structure
         current = []
         self.goals = []
         for i in range(self.n_agents):
@@ -36,31 +46,39 @@ class Mstar:
             current.append(Node((start[i][0], start[i][1]), None, start[i][2], self.heuristic(i, start[i])))
         self.start = MstarNode(current)
         self.goal = MstarNode(self.goals)
+        # Create the heap and push the starting note to it
         self.open = []
         heapq.heappush(self.open, MstarNode(current, 0))
 
     def solve(self):
         while len(self.open) > 0:
+            # Get the MstarNode with the lowest heuristic
             current = heapq.heappop(self.open)
+            # If this is the goal then retrace the path and return it
             if current == self.goal:
                 res = []
                 while current != self.start:
                     res.append(current.nodes)
                     current = current.backptr
                 return res
+            # Otherwise we loop over all the neighbors
             for nbr in self.getNeighbors(current):
-                print(nbr)
+                # Convert the neighbor to a MstarNode and add current to its backset
                 neighbor = MstarNode(nbr)
                 neighbor.backset.add(current)
+                # Look if there are collisions in neighbor and add those to the collision set and backpropagate this
                 newCollisions = self.phi(current.nodes, neighbor.nodes)
                 neighbor.collision_set.update(newCollisions)
                 self.backprop(current, neighbor.collision_set)
+                # If neighbor has no collisions and the current path to it is cheaper
                 if len(newCollisions) == 0 and current.cost + self.getMoveCost(current, neighbor) < neighbor.cost:
+                    # Update the cost, add current to its backptr and push it to the heap
                     neighbor.cost = current.cost + self.getMoveCost(current, neighbor)
                     neighbor.backptr = current
                     heapq.heappush(self.open, neighbor)
 
     def getMoveCost(self, current, next):
+        """"Gets the move cost between two MstarNodes"""
         cost = 0
         for i in range(self.n_agents):
             if current.nodes[i] != next.nodes[i]:
@@ -68,6 +86,7 @@ class Mstar:
         return cost
 
     def backprop(self, current: MstarNode, collisions):
+        """"Backpropagate a new collision to all backsets recursively"""
         if not collisions.issubset(current.collision_set):
             current.collision_set.update(collisions)
             heapq.heappush(self.open, current)
@@ -75,6 +94,11 @@ class Mstar:
                 self.backprop(next, current.collision_set)
 
     def phi(self, current, next):
+        """
+        Looks for collisions between the current and next MstarNode.
+        There are two types, namely two agents in current being on the same vertex,
+        or an edge being used twice between current and next.
+        """
         current = [temp.position for temp in current]
         next = [temp.position for temp in next]
         seen = set()
@@ -88,12 +112,15 @@ class Mstar:
         return set([i for i, node in enumerate(next) if node in double])
 
     def getNeighbors(self, current: MstarNode):
+        """Get the neighbors of a MstarNode"""
         neighbors = []
         options = []
+        # Loop over all the agents
         for i in range(self.n_agents):
             node: Node = current.nodes[i]
             options_i = []
             if i in current.collision_set:
+                # If the agent in the collision set we add the current node as well as all possible nodes
                 options_i.append(node)
                 (x, y) = node.position
                 moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
@@ -102,9 +129,11 @@ class Mstar:
                 options_i.append(
                     Node(moves[node.rotation], node, node.rotation, self.heuristic(i, moves[node.rotation])))
             else:
+                # If the agent is not in the collision set we add only the optimal following node
                 nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
                 options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0])))
             options.append(options_i)
+        # Take the cartesian product to get all options
         for element in itertools.product(*options):
             neighbors.append(list(element))
         return neighbors
@@ -114,15 +143,53 @@ class Mstar:
 
 
 if __name__ == "__main__":
-    problem_graph = [[0, 0, 0, 0, 0, 0, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 1, 0, 1, 0, 1, 0],
-                     [0, 0, 0, 0, 0, 0, 0]]
-    start = ((0, 0, 0), (0, 4, 0))
-    end = ((0, 5, 90), (0, 0, 270))
-    print(Mstar(problem_graph, start, end).solve())
+    matrix = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+    start = ((5, 23, 270), (3, 6, 0), (19, 11, 270), (4, 23, 270))
+    end = ((41, 15, 90), (12, 16, 180), (2, 19, 0), (15, 20, 90))
+    print(Mstar(matrix, start, end).solve())
