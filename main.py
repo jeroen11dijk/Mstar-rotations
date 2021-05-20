@@ -84,7 +84,7 @@ class Mstar:
                     neighbor.cost = current.cost + self.getMoveCost(current, neighbor)
                     neighbor.backptr = current
                     heapq.heappush(self.open, neighbor)
-        return "No path has found"
+        raise ValueError("No path has found")
 
     def getMoveCost(self, current, next):
         """"Gets the move cost between two MstarNodes"""
@@ -140,13 +140,15 @@ class Mstar:
                                           self.heuristic(i, moves[node.rotation], node.rotation)))
             else:
                 # If the agent is not in the collision set we add only the optimal following node
-                if (node, self.goal.nodes[i]) in self.policy:
-                    nextPos = self.policy[(node, self.goal.nodes[i])]
-                else:
-                    nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
-                    self.policy[(node, self.goal.nodes[i])] = nextPos
-                if isinstance(nextPos, str):
-                    print(node, self.goal.nodes[i])
+                try:
+                    if (node, self.goal.nodes[i]) in self.policy:
+                        nextPos = self.policy[(node, self.goal.nodes[i])]
+                    else:
+                        nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
+                        self.policy[(node, self.goal.nodes[i])] = nextPos
+                except ValueError:
+                    print(f"start: {node}, goal: {self.goal.nodes[i]}")
+                    raise RuntimeError()
                 options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0], nextPos[1])))
             options.append(options_i)
         # Take the cartesian product to get all options
