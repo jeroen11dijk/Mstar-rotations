@@ -76,7 +76,7 @@ class Astar:
                 nbr.g = current.g + 1
                 nbr.f = nbr.g + nbr.h
                 heapq.heappush(open, nbr)
-        return "No path found"
+        raise ValueError("No path found!")
 
 
 if __name__ == "__main__":

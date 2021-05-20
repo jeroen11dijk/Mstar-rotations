@@ -31,7 +31,7 @@ class MstarNode:
         return '({0}, {1})'.format(self.nodes, self.cost)
 
     def __hash__(self):
-        return hash(tuple([node for node in self.nodes]))
+        return hash(tuple(self.nodes))
 
 
 class Mstar:
@@ -50,7 +50,7 @@ class Mstar:
         self.goal = MstarNode(self.goals)
         # Create the heap and push the starting note to it
         self.open = []
-        self.seen = {MstarNode(current, 0): MstarNode(current, 0)}
+        self.seen = {tuple(current): MstarNode(current, 0)}
         heapq.heappush(self.open, MstarNode(current, 0))
 
     def solve(self):
@@ -68,11 +68,7 @@ class Mstar:
             neighbors = self.getNeighbors(current)
             for nbr in neighbors:
                 # Convert the neighbor to a MstarNode and add current to its backset
-                if MstarNode(nbr) in self.seen:
-                    neighbor = self.seen[MstarNode(nbr)]
-                else:
-                    neighbor = MstarNode(nbr)
-                    self.seen[neighbor] = neighbor
+                neighbor = self.seen.setdefault(tuple(nbr), MstarNode(nbr))
                 neighbor.backset.add(current)
                 # Look if there are collisions in neighbor and add those to the collision set and backpropagate this
                 newCollisions = self.phi(current.nodes, neighbor.nodes)
@@ -84,7 +80,7 @@ class Mstar:
                     neighbor.cost = current.cost + self.getMoveCost(current, neighbor)
                     neighbor.backptr = current
                     heapq.heappush(self.open, neighbor)
-        return "No path has found"
+        raise ValueError("No path has found")
 
     def getMoveCost(self, current, next):
         """"Gets the move cost between two MstarNodes"""
@@ -140,13 +136,15 @@ class Mstar:
                                           self.heuristic(i, moves[node.rotation], node.rotation)))
             else:
                 # If the agent is not in the collision set we add only the optimal following node
-                if (node, self.goal.nodes[i]) in self.policy:
-                    nextPos = self.policy[(node, self.goal.nodes[i])]
-                else:
-                    nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
-                    self.policy[(node, self.goal.nodes[i])] = nextPos
-                if isinstance(nextPos, str):
-                    print(node, self.goal.nodes[i])
+                try:
+                    if (node, self.goal.nodes[i]) in self.policy:
+                        nextPos = self.policy[(node, self.goal.nodes[i])]
+                    else:
+                        nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
+                        self.policy[(node, self.goal.nodes[i])] = nextPos
+                except ValueError:
+                    print(f"start: {node}, goal: {self.goal.nodes[i]}")
+                    raise RuntimeError()
                 options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0], nextPos[1])))
             options.append(options_i)
         # Take the cartesian product to get all options
