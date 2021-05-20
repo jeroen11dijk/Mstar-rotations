@@ -38,6 +38,7 @@ class Mstar:
     def __init__(self, grid, start, end):
         self.grid = grid
         self.n_agents = len(start)
+        self.policy = {}
         # Convert the start and end to a MstarNode structure
         current = []
         self.goals = []
@@ -139,7 +140,11 @@ class Mstar:
                                           self.heuristic(i, moves[node.rotation], node.rotation)))
             else:
                 # If the agent is not in the collision set we add only the optimal following node
-                nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
+                if (node, self.goal.nodes[i]) in self.policy:
+                    nextPos = self.policy[(node, self.goal.nodes[i])]
+                else:
+                    nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
+                    self.policy[(node, self.goal.nodes[i])] = nextPos
                 if isinstance(nextPos, str):
                     print(node, self.goal.nodes[i])
                 options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0], nextPos[1])))
