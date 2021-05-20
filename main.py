@@ -50,7 +50,7 @@ class Mstar:
         self.goal = MstarNode(self.goals)
         # Create the heap and push the starting note to it
         self.open = []
-        self.seen = {MstarNode(current, 0): MstarNode(current, 0)}
+        self.seen = {tuple(current): MstarNode(current, 0)}
         heapq.heappush(self.open, MstarNode(current, 0))
 
     def solve(self):
@@ -68,11 +68,7 @@ class Mstar:
             neighbors = self.getNeighbors(current)
             for nbr in neighbors:
                 # Convert the neighbor to a MstarNode and add current to its backset
-                if MstarNode(nbr) in self.seen:
-                    neighbor = self.seen[MstarNode(nbr)]
-                else:
-                    neighbor = MstarNode(nbr)
-                    self.seen[neighbor] = neighbor
+                neighbor = self.seen.setdefault(tuple(nbr), MstarNode(nbr))
                 neighbor.backset.add(current)
                 # Look if there are collisions in neighbor and add those to the collision set and backpropagate this
                 newCollisions = self.phi(current.nodes, neighbor.nodes)
