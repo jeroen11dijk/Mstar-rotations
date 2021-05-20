@@ -1,9 +1,10 @@
 import heapq
+from typing import Tuple
 
 
 class Node:
     # Initialize the class
-    def __init__(self, position: (int, int), parent, rotation: int, heuristic: int):
+    def __init__(self, position: Tuple[int, int], parent, rotation: int, heuristic: int):
         self.position = position
         self.parent = parent
         self.rotation = rotation % 360
@@ -34,7 +35,8 @@ class Astar:
         self.start = start
 
     def heuristic(self, node, rotation):
-        return abs(node[0] - self.goal.position[0]) + abs(node[1] - self.goal.position[1]) + abs((rotation - self.goal.rotation)/90)
+        return abs(node[0] - self.goal.position[0]) + abs(node[1] - self.goal.position[1]) + abs(
+            (rotation - self.goal.rotation) / 90)
 
     def cost(self, node):
         return abs(node.position[0] - self.start.position[0]) + abs(node.position[1] - self.start.position[1])
@@ -57,9 +59,12 @@ class Astar:
 
             (x, y) = current.position
             moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
-            turnRight = Node(current.position, current, current.rotation + 90, self.heuristic(current.position, current.rotation + 90))
-            turnLeft = Node(current.position, current, current.rotation - 90, self.heuristic(current.position, current.rotation - 90))
-            move = Node(moves[current.rotation], current, current.rotation, self.heuristic(moves[current.rotation], current.rotation))
+            turnRight = Node(current.position, current, current.rotation + 90,
+                             self.heuristic(current.position, current.rotation + 90))
+            turnLeft = Node(current.position, current, current.rotation - 90,
+                            self.heuristic(current.position, current.rotation - 90))
+            move = Node(moves[current.rotation], current, current.rotation,
+                        self.heuristic(moves[current.rotation], current.rotation))
             neighbors = [turnRight, turnLeft, move]
             for nbr in neighbors:
                 xrange = 0 <= nbr.position[0] < len(self.grid)
@@ -122,6 +127,6 @@ if __name__ == "__main__":
             [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    start = Node((3, 16), None, 90, 10)
-    end = Node((12, 16), None, 180, 0)
+    start = Node((23, 16), None, 0, 10)
+    end = Node((31, 17), None, 90, 0)
     print(Astar(grid, start, end).solve())

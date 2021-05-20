@@ -43,7 +43,8 @@ class Mstar:
         self.goals = []
         for i in range(self.n_agents):
             self.goals.append(Node((end[i][0], end[i][1]), None, end[i][2], 0))
-            current.append(Node((start[i][0], start[i][1]), None, start[i][2], self.heuristic(i, start[i])))
+            current.append(
+                Node((start[i][0], start[i][1]), None, start[i][2], self.heuristic(i, start[i], start[i][2])))
         self.start = MstarNode(current)
         self.goal = MstarNode(self.goals)
         # Create the heap and push the starting note to it
@@ -63,7 +64,8 @@ class Mstar:
                     current = current.backptr
                 return res
             # Otherwise we loop over all the neighbors
-            for nbr in self.getNeighbors(current):
+            neighbors = self.getNeighbors(current)
+            for nbr in neighbors:
                 # Convert the neighbor to a MstarNode and add current to its backset
                 if MstarNode(nbr) in self.seen:
                     neighbor = self.seen[MstarNode(nbr)]
@@ -132,20 +134,24 @@ class Mstar:
                 moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
                 options_i.append(Node(node.position, node, node.rotation + 90, node.h))
                 options_i.append(Node(node.position, node, node.rotation - 90, node.h))
-                options_i.append(
-                    Node(moves[node.rotation], node, node.rotation, self.heuristic(i, moves[node.rotation])))
+                if self.grid[moves[node.rotation][0]][moves[node.rotation][1]] == 0:
+                    options_i.append(Node(moves[node.rotation], node, node.rotation,
+                                          self.heuristic(i, moves[node.rotation], node.rotation)))
             else:
                 # If the agent is not in the collision set we add only the optimal following node
                 nextPos = Astar(self.grid, node, self.goal.nodes[i]).solve()
-                options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0])))
+                if isinstance(nextPos, str):
+                    print(node, self.goal.nodes[i])
+                options_i.append(Node(nextPos[0], node, nextPos[1], self.heuristic(i, nextPos[0], nextPos[1])))
             options.append(options_i)
         # Take the cartesian product to get all options
         for element in itertools.product(*options):
             neighbors.append(list(element))
         return neighbors
 
-    def heuristic(self, index, node):
-        return abs(node[0] - self.goals[index].position[0]) + abs(node[1] - self.goals[index].position[1])
+    def heuristic(self, index, position, rotation):
+        return abs(position[0] - self.goals[index].position[0]) + abs(
+            position[1] - self.goals[index].position[1]) + + abs((rotation - self.goals[index].rotation) / 90)
 
 
 if __name__ == "__main__":
@@ -196,6 +202,9 @@ if __name__ == "__main__":
               [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
               [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
               [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    start = ((5, 23, 270), (3, 6, 0), (19, 11, 270), (4, 23, 270))
-    end = ((41, 15, 90), (12, 16, 180), (2, 19, 0), (15, 20, 90))
+    start = (
+        (23, 21, 90), (31, 9, 90), (5, 9, 0), (12, 11, 90), (1, 24, 180), (27, 23, 180), (28, 9, 180),
+        (3, 7, 0), (5, 21, 0), (30, 23, 90), (20, 9, 180))
+    end = ((26, 3, 180), (45, 20, 0), (44, 9, 0), (24, 17, 270), (37, 13, 270), (22, 7, 0), (3, 4, 0),
+           (31, 17, 90), (16, 25, 180), (10, 21, 180), (16, 23, 0))
     print(Mstar(matrix, start, end).solve())
