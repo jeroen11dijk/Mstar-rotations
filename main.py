@@ -31,7 +31,7 @@ class MstarNode:
         return '({0}, {1})'.format(self.nodes, self.cost)
 
     def __hash__(self):
-        return hash(tuple([node for node in self.nodes]))
+        return hash(tuple(self.nodes))
 
 
 class Mstar:
