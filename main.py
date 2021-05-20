@@ -48,6 +48,7 @@ class Mstar:
         self.goal = MstarNode(self.goals)
         # Create the heap and push the starting note to it
         self.open = []
+        self.seen = {MstarNode(current, 0): MstarNode(current, 0)}
         heapq.heappush(self.open, MstarNode(current, 0))
 
     def solve(self):
@@ -64,7 +65,11 @@ class Mstar:
             # Otherwise we loop over all the neighbors
             for nbr in self.getNeighbors(current):
                 # Convert the neighbor to a MstarNode and add current to its backset
-                neighbor = MstarNode(nbr)
+                if MstarNode(nbr) in self.seen:
+                    neighbor = self.seen[MstarNode(nbr)]
+                else:
+                    neighbor = MstarNode(nbr)
+                    self.seen[neighbor] = neighbor
                 neighbor.backset.add(current)
                 # Look if there are collisions in neighbor and add those to the collision set and backpropagate this
                 newCollisions = self.phi(current.nodes, neighbor.nodes)
@@ -76,6 +81,7 @@ class Mstar:
                     neighbor.cost = current.cost + self.getMoveCost(current, neighbor)
                     neighbor.backptr = current
                     heapq.heappush(self.open, neighbor)
+        return "No path has found"
 
     def getMoveCost(self, current, next):
         """"Gets the move cost between two MstarNodes"""
