@@ -9,11 +9,13 @@ DIR_FROM_ROT = {
     270: (-1, 0),
 }
 
+
 @dataclass
 class State:
     x: int
     y: int
     r: int
+
 
 def valid_state(state: State) -> bool:
     return (
@@ -22,6 +24,7 @@ def valid_state(state: State) -> bool:
         isinstance(state.r, int) and
         state.r in [0, 90, 180, 270]
     )
+
 
 class Agent:
     def __init__(self, agent: State, goal: State):
@@ -32,7 +35,7 @@ class Agent:
     def has(self, state: State) -> bool:
         return self.state == state
 
-    def in_wall(self, grid) -> bool:
+    def in_wall(self, grid: List[List[int]]) -> bool:
         return grid[self.state.y][self.state.x] == 1
 
     def move(self, state: State) -> bool:
@@ -52,9 +55,10 @@ class Agent:
         # Update my state.
         self.state = state
         return is_valid
-        
+
     def reached_goal(self) -> bool:
         return self.has(self.goal)
+
 
 class Verifier:
     def __init__(self, grid: List[List[int]], agents: List[Tuple[int, int, int]], goals: List[Tuple[int, int, int]]):
@@ -65,7 +69,8 @@ class Verifier:
         goals = [State(x, y, r) for (x, y, r) in goals]
         assert all(valid_state(state) for state in agents)
         assert all(valid_state(state) for state in goals)
-        self.agents = [Agent(agent, goal) for agent, goal in zip(agents, goals)]
+        self.agents = [Agent(agent, goal)
+                       for agent, goal in zip(agents, goals)]
         assert not any(agent.in_wall(self.grid) for agent in self.agents)
         # Check for collitions.
         for i, a in enumerate(self.agents):
@@ -76,7 +81,8 @@ class Verifier:
         solution = [
             [State(node.position[0], node.position[1], node.rotation) for node in turn] for turn in solution
         ]
-        assert all(all(valid_state(state) for state in turn) for turn in solution)
+        assert all(all(valid_state(state) for state in turn)
+                   for turn in solution)
 
         # Check that all moves are valid.
         for states in solution:
