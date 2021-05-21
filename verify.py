@@ -94,7 +94,10 @@ class Verifier:
                 for b in self.agents[(i + 1):]:
                     assert a.state != b.state
                     # Same edge collision.
-                    assert a.prev != b.state and a.state != b.prev
+                    if a.state == b.prev:
+                        assert b.state != a.prev
+                    elif b.state == a.prev:
+                        assert b.prev != a.state
 
         # Check that agents have reached their goal.
         for agent in self.agents:
