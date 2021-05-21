@@ -64,7 +64,7 @@ class Mstar:
                 while current != self.start:
                     res.append(current.nodes)
                     current = current.backptr
-                return res
+                return res[::-1]
             # Otherwise we loop over all the neighbors
             neighbors = self.getNeighbors(current)
             for nbr in neighbors:
@@ -129,10 +129,10 @@ class Mstar:
                 # If the agent in the collision set we add the current node as well as all possible nodes
                 options_i.append(node)
                 (x, y) = node.position
-                moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
+                moves = {0: (x, y - 1), 90: (x + 1, y), 180: (x, y + 1), 270: (x - 1, y)}
                 options_i.append(Node(node.position, node, node.rotation + 90, node.h))
                 options_i.append(Node(node.position, node, node.rotation - 90, node.h))
-                if self.grid[moves[node.rotation][0]][moves[node.rotation][1]] == 0:
+                if self.grid[moves[node.rotation][1]][moves[node.rotation][0]] == 0:
                     options_i.append(Node(moves[node.rotation], node, node.rotation,
                                           self.heuristic(i, moves[node.rotation], node.rotation)))
             else:
@@ -165,6 +165,6 @@ if __name__ == "__main__":
         [1, 1, 1, 0, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1]
     ]
-    start = ((1, 1, 0), (1, 7, 0))
-    end = ((1, 7, 0), (1, 1, 0))
+    start = ((1, 1, 0), (7, 1, 0))
+    end = ((7, 1, 0), (1, 1, 0))
     print(Mstar(matrix, start, end).solve())
