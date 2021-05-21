@@ -25,7 +25,7 @@ class MstarNode:
 
     def __lt__(self, other):
         """ Used to do the sorting of the heap, by comparing the sum of the heuristics per node. """
-        return sum([node.h for node in self.nodes]) < sum([node.h for node in other.nodes])
+        return sum([node.h for node in self.nodes]) + self.cost < sum([node.h for node in other.nodes]) + other.cost
 
     def __repr__(self):
         return '({0}, {1})'.format(self.nodes, self.cost)
