@@ -58,7 +58,7 @@ class Astar:
                 return self.start.position, self.start.rotation
 
             (x, y) = current.position
-            moves = {0: (x - 1, y), 90: (x, y + 1), 180: (x + 1, y), 270: (x, y - 1)}
+            moves = {0: (x, y - 1), 90: (x + 1, y), 180: (x, y + 1), 270: (x - 1, y)}
             turnRight = Node(current.position, current, current.rotation + 90,
                              self.heuristic(current.position, current.rotation + 90))
             turnLeft = Node(current.position, current, current.rotation - 90,
@@ -67,9 +67,9 @@ class Astar:
                         self.heuristic(moves[current.rotation], current.rotation))
             neighbors = [turnRight, turnLeft, move]
             for nbr in neighbors:
-                xrange = 0 <= nbr.position[0] < len(self.grid)
-                yrange = 0 <= nbr.position[1] < len(self.grid[0])
-                if not xrange or not yrange or self.grid[nbr.position[0]][nbr.position[1]] == 1:
+                xrange = 0 <= nbr.position[0] < len(self.grid[0])
+                yrange = 0 <= nbr.position[1] < len(self.grid)
+                if not xrange or not yrange or self.grid[nbr.position[1]][nbr.position[0]] == 1:
                     continue
                 if nbr in closed:
                     continue
@@ -127,6 +127,6 @@ if __name__ == "__main__":
             [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    start = Node((23, 16), None, 0, 10)
-    end = Node((31, 17), None, 90, 0)
+    start = Node((4, 2), None, 0, 10)
+    end = Node((9, 6), None, 90, 0)
     print(Astar(grid, start, end).solve())
