@@ -167,4 +167,8 @@ if __name__ == "__main__":
     ]
     start = ((1, 1, 0), (7, 1, 0))
     end = ((7, 1, 0), (1, 1, 0))
-    print(Mstar(matrix, start, end).solve())
+    solution = Mstar(matrix, start, end).solve()
+    print(solution)
+
+    from verify import Verifier
+    Verifier(matrix, start, end).verify(solution)
